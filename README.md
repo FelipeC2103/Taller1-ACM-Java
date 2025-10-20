@@ -1,15 +1,61 @@
-# Punto 4.
+# Taller 1 - Spring Beans
 
-**¿Por qué ocurre la excepción UnsatisfiedDependencyException?** 
+**Curso:** Backend Spring Framework
 
-La excepción UnsatisfiedDependencyException ocurre porque en InventoryService y OrderService se usa una inyección por constructor, lo que implica que ambos beans deben existir completamente construidos antes de ser inyectados, pero InventoryService no puede construirse sin OrderService y viceversa, lo que resulta en una dependencia circular.
+**Punto 1** Realizado por: Carlos Niño
+ 
 
-**Romper el ciclo con inyección de una de las dependencias con @Lazy e identificar el orden de inicialización de los beans**
+## Objetivo
+Analizar el ciclo de vida de cada bean y la diferencia entre  los creados manualmente.
 
-Se usará la anotanción @Lazy en el constructor de InventoryService (@Lazy OrderService orderService).
 
-El bean 'inventoryService' se crea primero porque depende de un bean @Lazy, el bean 'orderService' se crea cuando InventoryService lo necesite.
+## Desarrollo
 
-**Solución de diseño a la dependencia circular sin ocultarla con setter o @Lazy**
+1. Crear una clase ExperimentService anotada con @Component que imprima
+   mensajes en su metodo constructor.
+2. Declarar otro bean manualmente con @Bean dentro de una clase @Configuration,
+   puedes nombrar los beans con @Component(“nombreBean”) y
+   @Bean(“nombreBean”) para posteriormente utilizarlos con @Qualifier
+3. Agregar @Lazy a uno y observa cuándo se ejecuta su inicialización
+4. Intercambiar las anotaciones de @Lazy entre cada caso y observa su
+   comportamiento.
 
-Se propone crear un tercer servicio: SalesValidationService, que gestiona las interacciones entre InventoryService y OrderService.
+## Analisis
+
+Al crear los beans utilizando las anotaciones @Component y @Bean, se observa que ambos tipos de beans son gestionados por el contenedor de Spring, pero su ciclo de vida puede variar dependiendo de la configuración.
+
+1. **Ningun bean utilizando la anotacion @Lazy**
+
+    - Ambos beans se inicializan al momento de arrancar la aplicación.
+    - El constructor de cada bean se ejecuta inmediatamente, lo que significa que cualquier lógica dentro del constructor se ejecuta en el inicio.
+    
+    - Inicialización de ambos beans al inicio de la ejecución:
+   
+    ![img1.png](ContructorBeansSinLazy.png)
+
+    - Uso de los beans en el servicio:
+   
+    ![img2.png](EjecucionBeansSinLazy.png)
+
+2. **Bean con @Component utilizando @Lazy**
+
+    - El bean anotado con @Component y @Lazy se inicializa solo cuando es solicitado por primera vez.
+    - El constructor del bean con @Lazy no se ejecuta al inicio, sino cuando se accede al bean por primera vez.
+    
+    - Inicialización del bean @Bean al inicio :
+   
+    ![img3.png](ContructorBeanManualSinLazy.png)
+
+    - Inizialización del bean @Component al ser solicitado:
+   
+    ![img.png](ComponentConLazy.png)
+3. **Bean con @Bean utilizando @Lazy**
+
+    - El bean anotado con @Bean y @Lazy se comporta de manera similar al caso anterior.
+    - El constructor del bean con @Lazy no se ejecuta al inicio, sino cuando se accede al bean por primera vez.
+    
+    Su comportamiento es idéntico al del bean con @Component y @Lazy, por lo cual no se incluiran las imagenes de la ejecucion.
+
+## Conclusión
+
+El uso de la anotación @Lazy permite optimizar el rendimiento de la aplicación al retrasar la inicialización de los beans hasta que sean realmente necesarios. Esto es especialmente útil en aplicaciones con muchos beans o en situaciones donde algunos beans pueden no ser utilizados en todas las ejecuciones.
