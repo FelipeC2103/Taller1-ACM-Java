@@ -1,9 +1,6 @@
-# Taller 1 - Spring Beans
+# Taller 1 - Spring Beans PUNTO 1
 
 **Curso:** Backend Spring Framework
-
-**Punto 1** Realizado por: Carlos Niño
- 
 
 ## Objetivo
 Analizar el ciclo de vida de cada bean y la diferencia entre  los creados manualmente.
